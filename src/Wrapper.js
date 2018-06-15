@@ -1,58 +1,74 @@
-/* eslint-disable */
+'use strict';
 
-import React, { ReactElement } from 'react';
-import Dialog from './Layer';
-import getContainerRenderMixin from './_util/getContainerRenderMixin';
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-const Wrapper = React.createClass({
-  mixins: [
-    getContainerRenderMixin({
-      isVisible(instance) {
-        return instance.props.visible;
-      },
-      autoDestroy: false,
-      getComponent(instance, extra) {
-        return (
-          <Dialog
-            {...instance.props}
-            {...extra}
-            key="dialog"
-          />
-        );
-      },
-    }),
-  ],
+var _extends2 = require('babel-runtime/helpers/extends');
 
-  getDefaultProps() {
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _Layer = require('./Layer');
+
+var _Layer2 = _interopRequireDefault(_Layer);
+
+var _getContainerRenderMixin = require('./_util/getContainerRenderMixin');
+
+var _getContainerRenderMixin2 = _interopRequireDefault(_getContainerRenderMixin);
+
+var createReactClass = require('create-react-class');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var Wrapper = createReactClass({
+  displayName: 'Wrapper',
+
+  mixins: [(0, _getContainerRenderMixin2["default"])({
+    isVisible: function isVisible(instance) {
+      return instance.props.visible;
+    },
+
+    autoDestroy: false,
+    getComponent: function getComponent(instance, extra) {
+      return _react2["default"].createElement(_Layer2["default"], (0, _extends3["default"])({}, instance.props, extra, {
+        key: 'dialog'
+      }));
+    }
+  })],
+
+  getDefaultProps: function getDefaultProps() {
     return {
-      visible: false,
+      visible: false
     };
   },
+  shouldComponentUpdate: function shouldComponentUpdate(_ref) {
+    var visible = _ref.visible;
 
-  shouldComponentUpdate({ visible }) {
     return !!(this.props.visible || visible);
   },
-
-  componentWillUnmount() {
+  componentWillUnmount: function componentWillUnmount() {
     if (this.props.visible) {
       this.renderComponent({
         afterClose: this.removeContainer,
-        onClose() {
-        },
-        visible: false,
+        onClose: function onClose() {},
+
+        visible: false
       });
     } else {
       this.removeContainer();
     }
   },
-
-  getElement(part) {
+  getElement: function getElement(part) {
     return this._component.getElement(part);
   },
-
-  render() {
+  render: function render() {
     return null;
-  },
-});
+  }
+}); /* eslint-disable */
 
-export default Wrapper;
+exports["default"] = Wrapper;
+module.exports = exports['default'];

@@ -1,26 +1,58 @@
-/* eslint-disable */
+'use strict';
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import KeyCode from './_util/KeyCode';
-import Animate from 'rc-animate';
-import LazyRenderBox from './LazyRenderBox';
-import getScrollBarSize from './_util/getScrollBarSize';
-import assign from 'object-assign';
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-let uuid = 0;
-let openCount = 0;
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactDom = require('react-dom');
+
+var _reactDom2 = _interopRequireDefault(_reactDom);
+
+var _KeyCode = require('./_util/KeyCode');
+
+var _KeyCode2 = _interopRequireDefault(_KeyCode);
+
+var _rcAnimate = require('rc-animate');
+
+var _rcAnimate2 = _interopRequireDefault(_rcAnimate);
+
+var _LazyRenderBox = require('./LazyRenderBox');
+
+var _LazyRenderBox2 = _interopRequireDefault(_LazyRenderBox);
+
+var _getScrollBarSize = require('./_util/getScrollBarSize');
+
+var _getScrollBarSize2 = _interopRequireDefault(_getScrollBarSize);
+
+var _objectAssign = require('object-assign');
+
+var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
+var createReactClass = require('create-react-class');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var uuid = 0; /* eslint-disable */
+
+var openCount = 0;
 
 /* eslint react/no-is-mounted:0 */
 
-function noop() {
-}
+function noop() {}
 
 function getScroll(w, top) {
-  let ret = w[`page${top ? 'Y' : 'X'}Offset`];
-  const method = `scroll${top ? 'Top' : 'Left'}`;
+  var ret = w['page' + (top ? 'Y' : 'X') + 'Offset'];
+  var method = 'scroll' + (top ? 'Top' : 'Left');
   if (typeof ret !== 'number') {
-    const d = w.document;
+    var d = w.document;
     ret = d.documentElement[method];
     if (typeof ret !== 'number') {
       ret = d.body[method];
@@ -30,28 +62,29 @@ function getScroll(w, top) {
 }
 
 function setTransformOrigin(node, value) {
-  const style = node.style;
-  ['Webkit', 'Moz', 'Ms', 'ms'].forEach((prefix) => {
-    style[`${prefix}TransformOrigin`] = value;
+  var style = node.style;
+  ['Webkit', 'Moz', 'Ms', 'ms'].forEach(function (prefix) {
+    style[prefix + 'TransformOrigin'] = value;
   });
-  style[`transformOrigin`] = value;
+  style['transformOrigin'] = value;
 }
 
 function offset(el) {
-  const rect = el.getBoundingClientRect();
-  const pos = {
+  var rect = el.getBoundingClientRect();
+  var pos = {
     left: rect.left,
-    top: rect.top,
+    top: rect.top
   };
-  const doc = el.ownerDocument;
-  const w = doc.defaultView || doc.parentWindow;
+  var doc = el.ownerDocument;
+  var w = doc.defaultView || doc.parentWindow;
   pos.left += getScroll(w);
   pos.top += getScroll(w, true);
   return pos;
 }
 
-const Layer = React.createClass({
-  getDefaultProps() {
+var Layer = createReactClass({
+  displayName: 'Layer',
+  getDefaultProps: function getDefaultProps() {
     return {
       afterClose: noop,
       className: '',
@@ -60,32 +93,28 @@ const Layer = React.createClass({
       keyboard: true,
       maskClosable: true,
       prefixCls: 'rc-layer',
-      onClose: noop,
+      onClose: noop
     };
   },
-
-  componentWillMount() {
-    this.titleId = `rcLayerTitle${uuid++}`;
+  componentWillMount: function componentWillMount() {
+    this.titleId = 'rcLayerTitle' + uuid++;
   },
-
-  componentDidMount() {
+  componentDidMount: function componentDidMount() {
     this.componentDidUpdate({});
   },
-
-  componentDidUpdate(prevProps) {
-    const props = this.props;
-    const mousePosition = this.props.mousePosition;
+  componentDidUpdate: function componentDidUpdate(prevProps) {
+    var props = this.props;
+    var mousePosition = this.props.mousePosition;
     if (props.visible) {
       // first show
       if (!prevProps.visible) {
         this.lastOutSideFocusNode = document.activeElement;
         this.addScrollingEffect();
         this.refs.wrap.focus();
-        const layerNode = ReactDOM.findDOMNode(this.refs.layer);
+        var layerNode = _reactDom2["default"].findDOMNode(this.refs.layer);
         if (mousePosition) {
-          const elOffset = offset(layerNode);
-          setTransformOrigin(layerNode,
-            `${mousePosition.x - elOffset.left}px ${mousePosition.y - elOffset.top}px`);
+          var elOffset = offset(layerNode);
+          setTransformOrigin(layerNode, mousePosition.x - elOffset.left + 'px ' + (mousePosition.y - elOffset.top) + 'px');
         } else {
           setTransformOrigin(layerNode, '');
         }
@@ -101,32 +130,29 @@ const Layer = React.createClass({
       }
     }
   },
-
-  onAnimateLeave() {
+  onAnimateLeave: function onAnimateLeave() {
     if (this.refs.wrap) {
       this.refs.wrap.style.display = 'none';
     }
     this.removeScrollingEffect();
     this.props.afterClose();
   },
-
-  onMaskClick(e) {
+  onMaskClick: function onMaskClick(e) {
     if (e.target === e.currentTarget && this.props.maskClosable) {
       this.close(e);
     }
   },
-
-  onKeyDown(e) {
-    const props = this.props;
-    if (props.keyboard && e.keyCode === KeyCode.ESC) {
+  onKeyDown: function onKeyDown(e) {
+    var props = this.props;
+    if (props.keyboard && e.keyCode === _KeyCode2["default"].ESC) {
       this.close(e);
     }
     // keep focus inside layer
     if (props.visible) {
-      if (e.keyCode === KeyCode.TAB) {
-        const activeElement = document.activeElement;
-        const layerRoot = this.refs.wrap;
-        const sentinel = this.refs.sentinel;
+      if (e.keyCode === _KeyCode2["default"].TAB) {
+        var activeElement = document.activeElement;
+        var layerRoot = this.refs.wrap;
+        var sentinel = this.refs.sentinel;
         if (e.shiftKey) {
           if (activeElement === layerRoot) {
             sentinel.focus();
@@ -137,11 +163,10 @@ const Layer = React.createClass({
       }
     }
   },
-
-  getLayerElement() {
-    const props = this.props;
-    const prefixCls = props.prefixCls;
-    const dest: any = {};
+  getLayerElement: function getLayerElement() {
+    var props = this.props;
+    var prefixCls = props.prefixCls;
+    var dest = {};
     if (props.width !== undefined) {
       dest.width = props.width;
     }
@@ -149,115 +174,106 @@ const Layer = React.createClass({
       dest.height = props.height;
     }
 
-    const style = assign({}, props.style, dest);
-    const transitionName = this.getTransitionName();
-    const layerElement = (
-      <LazyRenderBox
-        role="document"
-        ref="layer"
-        style={style}
-        className={`${prefixCls} ${props.className || ''}`}
-        visible={props.visible}
-      >
-        {props.children}
-        <div tabIndex={0} ref="sentinel" style={{ width: 0, height: 0, overflow: 'hidden' }}>
-          sentinel
-        </div>
-      </LazyRenderBox>
+    var style = (0, _objectAssign2["default"])({}, props.style, dest);
+    var transitionName = this.getTransitionName();
+    var layerElement = _react2["default"].createElement(
+      _LazyRenderBox2["default"],
+      {
+        role: 'document',
+        ref: 'layer',
+        style: style,
+        className: prefixCls + ' ' + (props.className || ''),
+        visible: props.visible
+      },
+      props.children,
+      _react2["default"].createElement(
+        'div',
+        { tabIndex: 0, ref: 'sentinel', style: { width: 0, height: 0, overflow: 'hidden' } },
+        'sentinel'
+      )
     );
-    return (
-      <Animate
-        key="layer"
-        showProp="visible"
-        onLeave={this.onAnimateLeave}
-        transitionName={transitionName}
-        component=""
-        transitionAppear
-      >
-        {layerElement}
-      </Animate>
+    return _react2["default"].createElement(
+      _rcAnimate2["default"],
+      {
+        key: 'layer',
+        showProp: 'visible',
+        onLeave: this.onAnimateLeave,
+        transitionName: transitionName,
+        component: '',
+        transitionAppear: true
+      },
+      layerElement
     );
   },
-
-  getZIndexStyle() {
-    const style: any = {};
-    const props = this.props;
+  getZIndexStyle: function getZIndexStyle() {
+    var style = {};
+    var props = this.props;
     if (props.zIndex !== undefined) {
       style.zIndex = props.zIndex;
     }
     return style;
   },
-
-  getWrapStyle(): any {
-    return assign({}, this.getZIndexStyle(), this.props.wrapStyle);
+  getWrapStyle: function getWrapStyle() {
+    return (0, _objectAssign2["default"])({}, this.getZIndexStyle(), this.props.wrapStyle);
   },
-
-  getMaskStyle() {
-    return assign({}, this.getZIndexStyle(), this.props.maskStyle);
+  getMaskStyle: function getMaskStyle() {
+    return (0, _objectAssign2["default"])({}, this.getZIndexStyle(), this.props.maskStyle);
   },
-
-  getMaskElement() {
-    const props = this.props;
-    let maskElement;
+  getMaskElement: function getMaskElement() {
+    var props = this.props;
+    var maskElement = void 0;
     if (props.mask) {
-      const maskTransition = this.getMaskTransitionName();
-      maskElement = (
-        <LazyRenderBox
-          style={this.getMaskStyle()}
-          key="mask"
-          className={`${props.prefixCls}-mask`}
-          hiddenClassName={`${props.prefixCls}-mask-hidden`}
-          visible={props.visible}
-        />
-      );
+      var maskTransition = this.getMaskTransitionName();
+      maskElement = _react2["default"].createElement(_LazyRenderBox2["default"], {
+        style: this.getMaskStyle(),
+        key: 'mask',
+        className: props.prefixCls + '-mask',
+        hiddenClassName: props.prefixCls + '-mask-hidden',
+        visible: props.visible
+      });
       if (maskTransition) {
-        maskElement = (
-          <Animate
-            key="mask"
-            showProp="visible"
-            transitionAppear
-            component=""
-            transitionName={maskTransition}
-          >
-            {maskElement}
-          </Animate>
+        maskElement = _react2["default"].createElement(
+          _rcAnimate2["default"],
+          {
+            key: 'mask',
+            showProp: 'visible',
+            transitionAppear: true,
+            component: '',
+            transitionName: maskTransition
+          },
+          maskElement
         );
       }
     }
     return maskElement;
   },
-
-  getMaskTransitionName() {
-    const props = this.props;
-    let transitionName = props.maskTransitionName;
-    const animation = props.maskAnimation;
+  getMaskTransitionName: function getMaskTransitionName() {
+    var props = this.props;
+    var transitionName = props.maskTransitionName;
+    var animation = props.maskAnimation;
     if (!transitionName && animation) {
-      transitionName = `${props.prefixCls}-${animation}`;
+      transitionName = props.prefixCls + '-' + animation;
     }
     return transitionName;
   },
-
-  getTransitionName() {
-    const props = this.props;
-    let transitionName = props.transitionName;
-    const animation = props.animation;
+  getTransitionName: function getTransitionName() {
+    var props = this.props;
+    var transitionName = props.transitionName;
+    var animation = props.animation;
     if (!transitionName && animation) {
-      transitionName = `${props.prefixCls}-${animation}`;
+      transitionName = props.prefixCls + '-' + animation;
     }
     return transitionName;
   },
-
-  getElement(part) {
+  getElement: function getElement(part) {
     return this.refs[part];
   },
-
-  setScrollbar() {
+  setScrollbar: function setScrollbar() {
     if (this.bodyIsOverflowing && this.scrollbarWidth !== undefined) {
-      document.body.style.paddingRight = `${this.scrollbarWidth}px`;
+      document.body.style.paddingRight = this.scrollbarWidth + 'px';
     }
   },
-
-  addScrollingEffect() {
+  addScrollingEffect: function addScrollingEffect() {
     openCount++;
     if (openCount !== 1) {
       return;
@@ -267,8 +283,7 @@ const Layer = React.createClass({
     document.body.style.overflow = 'hidden';
     // this.adjustLayer();
   },
-
-  removeScrollingEffect() {
+  removeScrollingEffect: function removeScrollingEffect() {
     openCount--;
     if (openCount !== 0) {
       return;
@@ -277,70 +292,66 @@ const Layer = React.createClass({
     this.resetScrollbar();
     // this.resetAdjustments();
   },
-
-  close(e) {
+  close: function close(e) {
     this.props.onClose(e);
   },
-
-  checkScrollbar() {
-    let fullWindowWidth = window.innerWidth;
-    if (!fullWindowWidth) { // workaround for missing window.innerWidth in IE8
-      const documentElementRect = document.documentElement.getBoundingClientRect();
+  checkScrollbar: function checkScrollbar() {
+    var fullWindowWidth = window.innerWidth;
+    if (!fullWindowWidth) {
+      // workaround for missing window.innerWidth in IE8
+      var documentElementRect = document.documentElement.getBoundingClientRect();
       fullWindowWidth = documentElementRect.right - Math.abs(documentElementRect.left);
     }
     this.bodyIsOverflowing = document.body.clientWidth < fullWindowWidth;
     if (this.bodyIsOverflowing) {
-      this.scrollbarWidth = getScrollBarSize();
+      this.scrollbarWidth = (0, _getScrollBarSize2["default"])();
     }
   },
-  resetScrollbar() {
+  resetScrollbar: function resetScrollbar() {
     document.body.style.paddingRight = '';
   },
-  adjustLayer() {
+  adjustLayer: function adjustLayer() {
     if (this.refs.wrap && this.scrollbarWidth !== undefined) {
-      const maskIsOverflowing =
-        this.refs.wrap.scrollHeight > document.documentElement.clientHeight;
-      this.refs.wrap.style.paddingLeft =
-        `${!this.bodyIsOverflowing && maskIsOverflowing ? this.scrollbarWidth : ''}px`;
-      this.refs.wrap.style.paddingRight =
-        `${this.bodyIsOverflowing && !maskIsOverflowing ? this.scrollbarWidth : ''}px`;
+      var maskIsOverflowing = this.refs.wrap.scrollHeight > document.documentElement.clientHeight;
+      this.refs.wrap.style.paddingLeft = (!this.bodyIsOverflowing && maskIsOverflowing ? this.scrollbarWidth : '') + 'px';
+      this.refs.wrap.style.paddingRight = (this.bodyIsOverflowing && !maskIsOverflowing ? this.scrollbarWidth : '') + 'px';
     }
   },
-
-  resetAdjustments() {
+  resetAdjustments: function resetAdjustments() {
     if (this.refs.wrap) {
       this.refs.wrap.style.paddingLeft = this.refs.wrap.style.paddingLeft = '';
     }
   },
-
-  render() {
-    const props = this.props;
-    const prefixCls = props.prefixCls;
-    const style = this.getWrapStyle();
+  render: function render() {
+    var props = this.props;
+    var prefixCls = props.prefixCls;
+    var style = this.getWrapStyle();
     // clear hide display
     // and only set display after async anim, not here for hide
     if (props.visible) {
       style.display = null;
     }
-    return (
-      <div>
-        {this.getMaskElement()}
-        <div
-          tabIndex={-1}
-          onKeyDown={this.onKeyDown}
-          className={`${prefixCls}-wrap ${props.wrapClassName || ''}`}
-          ref="wrap"
-          onClick={this.onMaskClick}
-          role="layer"
-          aria-labelledby={props.title ? this.titleId : null}
-          style={style}
-          {...props.wrapProps}
-        >
-          {this.getLayerElement()}
-        </div>
-      </div>
+    return _react2["default"].createElement(
+      'div',
+      null,
+      this.getMaskElement(),
+      _react2["default"].createElement(
+        'div',
+        (0, _extends3["default"])({
+          tabIndex: -1,
+          onKeyDown: this.onKeyDown,
+          className: prefixCls + '-wrap ' + (props.wrapClassName || ''),
+          ref: 'wrap',
+          onClick: this.onMaskClick,
+          role: 'layer',
+          'aria-labelledby': props.title ? this.titleId : null,
+          style: style
+        }, props.wrapProps),
+        this.getLayerElement()
+      )
     );
-  },
+  }
 });
 
-export default Layer;
+exports["default"] = Layer;
+module.exports = exports['default'];
